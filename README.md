@@ -151,3 +151,43 @@ Since the system enforces Role-Based Access Control (RBAC), you cannot do anythi
 ## Support
 
 For issues, please check the deployment logs in Vercel or the database logs in Supabase.
+
+---
+
+## Local Development
+
+1.  **Clone the Repository**:
+    ```bash
+    git clone <your-repo-url>
+    cd opsuite
+    ```
+
+2.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Variables**:
+    Create a `.env.local` file in the root directory.
+
+4.  **Run Development Server**:
+    ```bash
+    npm run  dev
+    ```
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+5.  **Run Tests**:
+    ```bash
+    npm test
+    ```
+
+---
+
+## User Manual
+
+### Login
+- Navigate to `/login`.
+- Enter your email and password.
+
+### Dashboard
+- View summary cards and sidebar navigation.
