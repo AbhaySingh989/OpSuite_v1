@@ -10,6 +10,14 @@ type CustomerUpdate = Database['public']['Tables']['customers']['Update'];
 
 export async function getCustomers() {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    console.error('Unauthorized getCustomers request: missing user session');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('customers')
     .select('*')
@@ -25,6 +33,13 @@ export async function getCustomers() {
 
 export async function createCustomer(formData: CustomerInsert) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   const { error } = await supabase.from('customers').insert(formData);
 
   if (error) {
@@ -37,6 +52,13 @@ export async function createCustomer(formData: CustomerInsert) {
 
 export async function updateCustomer(id: string, formData: CustomerUpdate) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   const { error } = await supabase
     .from('customers')
     .update(formData)
@@ -52,6 +74,13 @@ export async function updateCustomer(id: string, formData: CustomerUpdate) {
 
 export async function deleteCustomer(id: string) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   // Soft delete logic if column exists, otherwise hard delete based on schema
   // Schema has updated_at but no is_deleted on master tables in original requirement text?
   // Wait, Requirement 3.1 says "Global Column Standard... is_deleted BOOLEAN DEFAULT FALSE".
