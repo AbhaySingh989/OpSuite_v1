@@ -8,20 +8,19 @@ import { IconSearch, IconPencil, IconTrash, IconPlus } from '@tabler/icons-react
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 import { createPO } from '@/app/actions/po';
-import { getCustomers } from '@/app/actions/customers';
 import { Database } from '@/types/database.types';
-import { useEffect } from 'react';
 
 type PO = Database['public']['Tables']['purchase_orders']['Row'] & { customers: { name: string } | null };
 type Customer = Database['public']['Tables']['customers']['Row'];
 
 interface POListProps {
   initialPOs: PO[];
+  initialCustomers: Customer[];
 }
 
-export function POList({ initialPOs }: POListProps) {
+export function POList({ initialPOs, initialCustomers }: POListProps) {
   const [pos, setPOs] = useState(initialPOs);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customers] = useState<Customer[]>(initialCustomers);
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState('');
 
@@ -37,10 +36,6 @@ export function POList({ initialPOs }: POListProps) {
       order_date: (value) => (value ? null : 'Date is required'),
     },
   });
-
-  useEffect(() => {
-    getCustomers().then(setCustomers);
-  }, []);
 
   const handleSubmit = async (values: typeof form.values) => {
     // Need to handle user context on server for plant_id

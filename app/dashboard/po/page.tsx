@@ -10,5 +10,10 @@ export default async function PurchaseOrdersPage() {
     .select('*, customers(name)')
     .order('created_at', { ascending: false });
 
-  return <POList initialPOs={pos || []} />;
+  const { data: customers } = await supabase
+    .from('customers')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  return <POList initialPOs={pos || []} initialCustomers={customers || []} />;
 }
