@@ -299,7 +299,7 @@ ALTER TABLE override_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Helper function for RLS
-CREATE OR REPLACE FUNCTION auth.user_plants()
+CREATE OR REPLACE FUNCTION public.user_plants()
 RETURNS TABLE (plant_id UUID) AS $$
   SELECT plant_id FROM public.user_roles WHERE user_id = auth.uid()
 $$ LANGUAGE sql SECURITY DEFINER;
@@ -340,43 +340,43 @@ CREATE POLICY "Allow read access to master data for authenticated users" ON stan
 
 CREATE POLICY "Plant based access for POs" ON purchase_orders
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for WOs" ON work_orders
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Heats" ON heats
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Inventory" ON inventory_movements
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Lab Results" ON lab_results
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Lab Result Params" ON lab_result_parameters
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for TCs" ON test_certificates
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for TC Versions" ON test_certificate_versions
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Override Logs" ON override_logs
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 CREATE POLICY "Plant based access for Audit Logs" ON audit_logs
     TO authenticated
-    USING (plant_id IN (SELECT plant_id FROM auth.user_plants()));
+    USING (plant_id IN (SELECT plant_id FROM public.user_plants()));
 
 
 -- Triggers

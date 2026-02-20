@@ -12,6 +12,10 @@ const data = [
   { icon: IconFileInvoice, label: 'Purchase Orders', link: '/po' },
   { icon: IconSettings, label: 'Work Orders', link: '/work-orders' },
   { icon: IconFlask, label: 'Lab Results', link: '/lab-results' },
+  { icon: IconDatabase, label: 'Master Data', link: '/dashboard/master-data' },
+  { icon: IconFileInvoice, label: 'Purchase Orders', link: '/dashboard/po' },
+  { icon: IconSettings, label: 'Work Orders', link: '/dashboard/work-orders' },
+  { icon: IconFlask, label: 'Lab Results', link: '/dashboard/lab-results' },
 ];
 
 function NavLinks() {
