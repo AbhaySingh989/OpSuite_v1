@@ -1,11 +1,8 @@
 'use server';
 
-import { Card, Tabs, Text, Title } from '@mantine/core';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { CustomerList } from '@/components/CustomerList';
-import { ItemList } from '@/components/ItemList';
-import { StandardList } from '@/components/StandardList';
+import { MasterDataTabs } from '@/components/MasterDataTabs';
 
 export default async function MasterDataPage() {
   const supabase = createClient();
@@ -25,33 +22,13 @@ export default async function MasterDataPage() {
     ]);
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={2} mb="md">
-        Master Data
-      </Title>
-      <Tabs defaultValue="customers">
-        <Tabs.List>
-          <Tabs.Tab value="customers">Customers</Tabs.Tab>
-          <Tabs.Tab value="items">Items</Tabs.Tab>
-          <Tabs.Tab value="standards">Standards</Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="customers" pt="md">
-          {customersError ? <Text c="red">Failed to load customers: {customersError.message}</Text> : <CustomerList initialCustomers={customers || []} />}
-        </Tabs.Panel>
-
-        <Tabs.Panel value="items" pt="md">
-          {itemsError ? <Text c="red">Failed to load items: {itemsError.message}</Text> : <ItemList initialItems={items || []} />}
-        </Tabs.Panel>
-
-        <Tabs.Panel value="standards" pt="md">
-          {standardsError ? (
-            <Text c="red">Failed to load standards: {standardsError.message}</Text>
-          ) : (
-            <StandardList initialStandards={(standards as any) || []} />
-          )}
-        </Tabs.Panel>
-      </Tabs>
-    </Card>
+    <MasterDataTabs
+      customers={customers || []}
+      items={items || []}
+      standards={(standards as any) || []}
+      customersError={customersError?.message || null}
+      itemsError={itemsError?.message || null}
+      standardsError={standardsError?.message || null}
+    />
   );
 }
