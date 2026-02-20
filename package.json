@@ -10,10 +10,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@mantine/core": "^7.10.1",
-    "@mantine/dates": "^7.10.1",
-    "@mantine/hooks": "^7.10.1",
-    "@mantine/notifications": "^7.17.8",
+    "@mantine/core": "^8.3.15",
+    "@mantine/dates": "^8.3.15",
+    "@mantine/hooks": "^8.3.15",
+    "@mantine/notifications": "^8.3.15",
     "@react-pdf/renderer": "^3.4.4",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",

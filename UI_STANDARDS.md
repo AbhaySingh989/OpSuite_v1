@@ -1,7 +1,7 @@
 # UI Standards
 
 ## Global Principles
-- **Framework**: Mantine UI (v7+)
+- **Framework**: Mantine UI (8.x)
 - **Theme**: Default Mantine theme with minimal overrides.
 - **Font**: System font stack (Inter, Segoe UI, Roboto, etc.).
 - **Spacing**: Use Mantine spacing constants (xs, sm, md, lg, xl).
@@ -33,10 +33,10 @@
 - **Validation**: Inline error messages using `form.errors`.
 
 ### Data Tables
-- **Library**: Mantine DataTable (or custom Table component using Mantine primitives).
-- **Header**: `Table.Th fw={600}` background `gray.1`.
-- **Rows**: Hover effect enabled `highlightOnHover`.
-- **Pagination**: Standard pagination at the bottom.
+- **Library**: Mantine `Table` from `@mantine/core` using compound components (`Table`, `Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`).
+- **Header**: `Table.Th fw={600}` with background `gray.1`.
+- **Rows**: Hover effect enabled via `highlightOnHover`.
+- **Pagination**: Project-level pagination control at the bottom.
 - **Actions**: Edit/Delete icons in the last column.
 
 ### Modals

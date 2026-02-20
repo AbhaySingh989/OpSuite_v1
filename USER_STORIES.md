@@ -1,11 +1,24 @@
 # User Stories
 
 **Note to Developers/Agents**:
-- All UI components MUST be from Mantine UI (v7+).
+- All UI components MUST be from Mantine UI (8.x).
 - Use `UI_STANDARDS.md` for styling guidelines.
-- Use **Context07** MCP for best practices when implementing libraries.
+- Use **Context7** MCP for best practices when implementing libraries.
+- For every user story with UI scope, first generate a wireframe using the **Google Stitch MCP server** before writing implementation code.
+- Development must follow the Stitch-generated wireframe structure, layout, hierarchy, and interaction intent.
+- After implementation, validate the delivered screen against the Stitch wireframe and record any intentional deviations with rationale.
+- The Stitch wireframe is the baseline artifact for UI consistency across modules.
 - All database interactions must use `utils/supabase/server.ts` (Server Components/Actions) or `utils/supabase/client.ts` (Client Components).
 - RLS policies are strictly enforced. Ensure `plant_id` is handled correctly in all write operations.
+
+---
+
+## Mandatory UI Workflow (All UI Stories)
+1. Generate wireframe using Google Stitch MCP server for the target story/screen.
+2. Review wireframe against `UI_STANDARDS.md` and story acceptance criteria before coding.
+3. Implement UI and behavior in Next.js + Mantine based on the approved wireframe.
+4. Validate implementation against the Stitch wireframe (layout, component hierarchy, states, and primary interactions).
+5. Document deviations (if any) and ensure they are intentional, minimal, and justified by functional or technical constraints.
 
 ---
 
@@ -188,7 +201,7 @@
 **BUSINESS_OBJECTIVE:** Initiate procurement of materials from customers/suppliers.
 **FUNCTIONAL_DESCRIPTION:** User fills PO form (Customer, Order Date, PO Number). System saves as 'draft'.
 **TECHNICAL_SCOPE:**
-- PO List View (DataTable).
+- PO List View (Mantine `Table` with project-level sorting/filtering/pagination patterns).
 - PO Create Modal (Mantine Form).
 - Server Action `createPO`.
 **DEPENDENCIES:** Master Data (Customers).
@@ -457,7 +470,7 @@
 **FUNCTIONAL_DESCRIPTION:** User selects Customers tab and sees customer list with key fields.
 **TECHNICAL_SCOPE:**
 - Fetch `customers` from Supabase.
-- Render list using Mantine `Table` (or `DataTable` equivalent in current stack).
+- Render list using Mantine `Table` (`Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`) with project-level sorting/filtering/pagination patterns.
 - Include loading and error states with Mantine `Loader` and notifications.
 **DEPENDENCIES:** US_MD_001, `customers` table.
 **ACCEPTANCE_CRITERIA:**
