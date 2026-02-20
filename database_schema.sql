@@ -314,6 +314,18 @@ DO $$ BEGIN
     DROP POLICY IF EXISTS "Allow read access to master data for authenticated users" ON items;
     DROP POLICY IF EXISTS "Allow read access to master data for authenticated users" ON standards;
     DROP POLICY IF EXISTS "Allow read access to master data for authenticated users" ON standard_parameters;
+    DROP POLICY IF EXISTS "Allow master data insert for admin/store on customers" ON customers;
+    DROP POLICY IF EXISTS "Allow master data update for admin/store on customers" ON customers;
+    DROP POLICY IF EXISTS "Allow master data delete for admin/store on customers" ON customers;
+    DROP POLICY IF EXISTS "Allow master data insert for admin/store on items" ON items;
+    DROP POLICY IF EXISTS "Allow master data update for admin/store on items" ON items;
+    DROP POLICY IF EXISTS "Allow master data delete for admin/store on items" ON items;
+    DROP POLICY IF EXISTS "Allow master data insert for admin/store on standards" ON standards;
+    DROP POLICY IF EXISTS "Allow master data update for admin/store on standards" ON standards;
+    DROP POLICY IF EXISTS "Allow master data delete for admin/store on standards" ON standards;
+    DROP POLICY IF EXISTS "Allow master data insert for admin/store on standard_parameters" ON standard_parameters;
+    DROP POLICY IF EXISTS "Allow master data update for admin/store on standard_parameters" ON standard_parameters;
+    DROP POLICY IF EXISTS "Allow master data delete for admin/store on standard_parameters" ON standard_parameters;
 
     DROP POLICY IF EXISTS "Plant based access for POs" ON purchase_orders;
     DROP POLICY IF EXISTS "Plant based access for WOs" ON work_orders;
@@ -335,6 +347,198 @@ CREATE POLICY "Allow read access to master data for authenticated users" ON cust
 CREATE POLICY "Allow read access to master data for authenticated users" ON items FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Allow read access to master data for authenticated users" ON standards FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Allow read access to master data for authenticated users" ON standard_parameters FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Allow master data insert for admin/store on customers" ON customers
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data update for admin/store on customers" ON customers
+    FOR UPDATE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    )
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data delete for admin/store on customers" ON customers
+    FOR DELETE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data insert for admin/store on items" ON items
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data update for admin/store on items" ON items
+    FOR UPDATE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    )
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data delete for admin/store on items" ON items
+    FOR DELETE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data insert for admin/store on standards" ON standards
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data update for admin/store on standards" ON standards
+    FOR UPDATE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    )
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data delete for admin/store on standards" ON standards
+    FOR DELETE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data insert for admin/store on standard_parameters" ON standard_parameters
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data update for admin/store on standard_parameters" ON standard_parameters
+    FOR UPDATE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    )
+    WITH CHECK (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
+
+CREATE POLICY "Allow master data delete for admin/store on standard_parameters" ON standard_parameters
+    FOR DELETE
+    TO authenticated
+    USING (
+      EXISTS (
+        SELECT 1
+        FROM public.user_roles ur
+        JOIN public.roles r ON r.id = ur.role_id
+        WHERE ur.user_id = auth.uid()
+          AND r.name IN ('admin', 'store')
+      )
+    );
 
 -- Transactional Data Policies (Plant Scoped)
 
