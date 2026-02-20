@@ -1,10 +1,14 @@
-import { Card, Text, Title } from '@mantine/core';
+'use server';
 
-export default function PurchaseOrdersPage() {
-  return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={2} mb="xs">Purchase Orders</Title>
-      <Text c="dimmed">This module is available, but detailed screens are not implemented yet.</Text>
-    </Card>
-  );
+import { createClient } from '@/utils/supabase/server';
+import { POList } from '@/components/POList';
+
+export default async function PurchaseOrdersPage() {
+  const supabase = createClient();
+  const { data: pos } = await supabase
+    .from('purchase_orders')
+    .select('*, customers(name)')
+    .order('created_at', { ascending: false });
+
+  return <POList initialPOs={pos || []} />;
 }

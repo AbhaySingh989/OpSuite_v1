@@ -32,7 +32,7 @@ export async function createStandard(formData: StandardInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/standards');
+  revalidatePath('/dashboard/master-data/standards');
   return { success: true, data };
 }
 
@@ -44,7 +44,7 @@ export async function createParameter(formData: ParameterInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/standards');
+  revalidatePath('/dashboard/master-data/standards');
   return { success: true };
 }
 
@@ -56,7 +56,7 @@ export async function deleteStandard(id: string) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/standards');
+  revalidatePath('/dashboard/master-data/standards');
   return { success: true };
 }
 
@@ -68,6 +68,6 @@ export async function deleteParameter(id: string) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/standards');
+  revalidatePath('/dashboard/master-data/standards');
   return { success: true };
 }

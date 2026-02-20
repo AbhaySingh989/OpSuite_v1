@@ -17,7 +17,7 @@ export function LabWOList({ initialWOs }: { initialWOs: WO[] }) {
         <Badge color="blue">{wo.status}</Badge>
       </Table.Td>
       <Table.Td>
-        <Button size="xs" onClick={() => router.push(`/lab-results/${wo.id}`)}>
+        <Button size="xs" onClick={() => router.push(`/dashboard/lab-results/${wo.id}`)}>
           Enter Results
         </Button>
       </Table.Td>

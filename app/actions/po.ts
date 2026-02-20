@@ -50,6 +50,6 @@ export async function createPO(formData: POInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/po');
+  revalidatePath('/dashboard/po');
   return { success: true };
 }

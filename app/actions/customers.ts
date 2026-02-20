@@ -31,7 +31,7 @@ export async function createCustomer(formData: CustomerInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/customers');
+  revalidatePath('/dashboard/master-data/customers');
   return { success: true };
 }
 
@@ -46,7 +46,7 @@ export async function updateCustomer(id: string, formData: CustomerUpdate) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/customers');
+  revalidatePath('/dashboard/master-data/customers');
   return { success: true };
 }
 
@@ -84,6 +84,6 @@ export async function deleteCustomer(id: string) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/customers');
+  revalidatePath('/dashboard/master-data/customers');
   return { success: true };
 }

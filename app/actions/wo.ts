@@ -28,6 +28,6 @@ export async function createWO(formData: WOInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/work-orders');
+  revalidatePath('/dashboard/work-orders');
   return { success: true };
 }

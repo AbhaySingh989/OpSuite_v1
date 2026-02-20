@@ -1,10 +1,14 @@
-import { Card, Text, Title } from '@mantine/core';
+'use server';
 
-export default function WorkOrdersPage() {
-  return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={2} mb="xs">Work Orders</Title>
-      <Text c="dimmed">This module is available, but detailed screens are not implemented yet.</Text>
-    </Card>
-  );
+import { createClient } from '@/utils/supabase/server';
+import { WOList } from '@/components/WOList';
+
+export default async function WorkOrdersPage() {
+  const supabase = createClient();
+  const { data: wos } = await supabase
+    .from('work_orders')
+    .select('*, purchase_orders(po_number), items(item_code)')
+    .order('created_at', { ascending: false });
+
+  return <WOList initialWOs={wos || []} />;
 }

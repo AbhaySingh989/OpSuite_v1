@@ -1,10 +1,15 @@
-import { Card, Text, Title } from '@mantine/core';
+'use server';
 
-export default function LabResultsPage() {
-  return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={2} mb="xs">Lab Results</Title>
-      <Text c="dimmed">This module is available, but detailed screens are not implemented yet.</Text>
-    </Card>
-  );
+import { createClient } from '@/utils/supabase/server';
+import { LabWOList } from '@/components/LabWOList';
+
+export default async function LabResultsPage() {
+  const supabase = createClient();
+  const { data: wos } = await supabase
+    .from('work_orders')
+    .select('*, items(item_code)')
+    .in('status', ['in_production', 'lab_pending'])
+    .order('created_at', { ascending: false });
+
+  return <LabWOList initialWOs={wos || []} />;
 }

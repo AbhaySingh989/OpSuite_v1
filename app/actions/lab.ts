@@ -71,7 +71,7 @@ export async function submitLabResult(resultId: string, updates: { paramId: stri
     }
   }
 
-  revalidatePath('/lab-results');
+  revalidatePath('/dashboard/lab-results');
   return { success: true, error: null };
 }
 
@@ -97,6 +97,6 @@ export async function overrideParam(paramId: string, reason: string) {
     performed_by: user.id
   });
 
-  revalidatePath('/lab-results');
+  revalidatePath('/dashboard/lab-results');
   return { success: true };
 }

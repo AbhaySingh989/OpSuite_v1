@@ -177,7 +177,7 @@
 **BUSINESS_OBJECTIVE:** Initiate purchase of materials.
 **FUNCTIONAL_DESCRIPTION:** User creates a PO header.
 **TECHNICAL_SCOPE:**
-- **UI**: `/po/page.tsx` (List), `/po/create/page.tsx` (Form).
+- **UI**: `/dashboard/po/page.tsx` (List + Create flow).
     - Fields: PO Number, Customer (Dropdown), Order Date.
     - Status defaults to 'draft'.
 - **Backend**: `createPO` action.
@@ -191,32 +191,11 @@
 **AUDIT_REQUIREMENTS:** Trigger.
 **RLS_IMPACT:** `plant_id` mandatory.
 **AGENT_TESTING_CRITERIA:**
-1. Navigate to `/po`.
+1. Navigate to `/dashboard/po`.
 2. Click Create.
 3. Select Customer "Test Customer".
 4. Enter PO "PO-1001", Date "Today".
 5. Save. Verify redirection to PO List.
-**ACTOR:** Store Manager, Admin
-**PRECONDITION:** User has Store or Admin role.
-**BUSINESS_OBJECTIVE:** Initiate procurement of materials from customers/suppliers.
-**FUNCTIONAL_DESCRIPTION:** User fills PO form (Customer, Order Date, PO Number). System saves as 'draft'.
-**TECHNICAL_SCOPE:**
-- PO List View (Mantine `Table` with project-level sorting/filtering/pagination patterns).
-- PO Create Modal (Mantine Form).
-- Server Action `createPO`.
-**DEPENDENCIES:** Master Data (Customers).
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user submits valid PO form THEN system creates record in `purchase_orders` with status 'draft'.
-- AC_002: WHEN PO Number is duplicate THEN system returns error "PO Number already exists".
-- AC_003: WHEN creation is successful THEN system logs audit entry in `audit_logs` (via trigger).
-- AC_004: WHEN user views PO list THEN system shows only POs for their plant.
-**ERROR_SCENARIOS:** Validation error, DB error.
-**SECURITY_CONSIDERATIONS:** Only Store/Admin can create. RLS enforces `plant_id`.
-**AUDIT_REQUIREMENTS:** DB Trigger handles insert audit.
-**RLS_IMPACT:** Insert must include valid `plant_id` belonging to user.
-
----
-
 ## Module: Work Orders
 
 ### US_WO_001
@@ -227,7 +206,7 @@
 **BUSINESS_OBJECTIVE:** Plan production against a PO.
 **FUNCTIONAL_DESCRIPTION:** User selects a PO, selects an Item, enters Quantity and WO Number.
 **TECHNICAL_SCOPE:**
-- **UI**: `/work-orders/page.tsx`.
+- **UI**: `/dashboard/work-orders/page.tsx`.
 - **Backend**: `createWO` action.
 **DEPENDENCIES:** PO, Items.
 **ACCEPTANCE_CRITERIA:**
@@ -238,7 +217,7 @@
 **AUDIT_REQUIREMENTS:** Trigger.
 **RLS_IMPACT:** `plant_id` mandatory.
 **AGENT_TESTING_CRITERIA:**
-1. Navigate to `/work-orders`.
+1. Navigate to `/dashboard/work-orders`.
 2. Click Create.
 3. Select PO "PO-1001".
 4. Select Item "ITEM-001".
@@ -288,7 +267,7 @@
 **BUSINESS_OBJECTIVE:** Record quality parameters.
 **FUNCTIONAL_DESCRIPTION:** QA selects WO. System fetches parameters from Standard. QA enters Observed Values.
 **TECHNICAL_SCOPE:**
-- **UI**: `/lab-results/page.tsx`.
+- **UI**: `/dashboard/lab-results/page.tsx`.
     - List WOs pending lab.
     - Entry Form: Dynamic fields based on Standard Parameters.
 - **Backend**: `submitLabResult`.
@@ -303,7 +282,7 @@
 **AUDIT_REQUIREMENTS:** Trigger.
 **RLS_IMPACT:** Plant RLS.
 **AGENT_TESTING_CRITERIA:**
-1. Navigate to `/lab-results`.
+1. Navigate to `/dashboard/lab-results`.
 2. Select "WO-2001".
 3. Select Standard "STD-TEST".
 4. Enter Carbon: 0.3 (Pass), Hardness: 250 (Fail).
@@ -418,30 +397,13 @@
 2. Select a test user.
 3. Assign "QA" role for "Main Plant".
 4. Verify assignment in list.
-**PRECONDITION:** PO exists and is approved (or draft depending on workflow).
-**BUSINESS_OBJECTIVE:** Schedule production for a specific item in a PO.
-**FUNCTIONAL_DESCRIPTION:** User selects a PO. Enters Item, Quantity, WO Number. System saves WO.
-**TECHNICAL_SCOPE:**
-- WO List View.
-- WO Create Modal.
-- Dropdown to select PO.
-- Dropdown to select Item.
-**DEPENDENCIES:** US_PO_001, Master Data (Items).
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user submits WO form THEN system creates record in `work_orders`.
-- AC_002: WHEN WO Number is duplicate THEN system shows error.
-- AC_003: WHEN PO is not selected THEN system prevents submission.
-**ERROR_SCENARIOS:** Invalid Item, Duplicate WO.
-**SECURITY_CONSIDERATIONS:** RLS `plant_id`.
-**AUDIT_REQUIREMENTS:** DB Trigger.
-**RLS_IMPACT:** Enforce plant context.
 
 ---
 
 ## Module: Master Data Screen
 
-### US_MD_001
-**ID:** US_MD_001
+### US_MDS_001
+**ID:** US_MDS_001
 **TITLE:** View Master Data Screen with Sectioned Navigation
 **ACTOR:** Admin, QA, Store
 **PRECONDITION:** User is logged in and can access `/dashboard/master-data`.
@@ -461,8 +423,8 @@
 **AUDIT_REQUIREMENTS:** None for read-only tab switching.
 **RLS_IMPACT:** Read queries must respect RLS policies.
 
-### US_MD_002
-**ID:** US_MD_002
+### US_MDS_002
+**ID:** US_MDS_002
 **TITLE:** View Customers List in Master Data
 **ACTOR:** Admin, QA, Store
 **PRECONDITION:** User is on Master Data screen.
@@ -472,7 +434,7 @@
 - Fetch `customers` from Supabase.
 - Render list using Mantine `Table` (`Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`) with project-level sorting/filtering/pagination patterns.
 - Include loading and error states with Mantine `Loader` and notifications.
-**DEPENDENCIES:** US_MD_001, `customers` table.
+**DEPENDENCIES:** US_MDS_001, `customers` table.
 **ACCEPTANCE_CRITERIA:**
 - AC_001: WHEN customers exist THEN system displays name, contact, email, and phone.
 - AC_002: WHEN fetch is in progress THEN loading indicator is visible.
@@ -482,8 +444,8 @@
 **AUDIT_REQUIREMENTS:** None for read-only access.
 **RLS_IMPACT:** Query execution must remain RLS-compliant.
 
-### US_MD_003
-**ID:** US_MD_003
+### US_MDS_003
+**ID:** US_MDS_003
 **TITLE:** Create Customer from Master Data
 **ACTOR:** Admin, Store
 **PRECONDITION:** User has permission to add customer records.
@@ -493,7 +455,7 @@
 - Add Mantine `Modal` + `TextInput` form for customer fields.
 - Validate required fields client-side before submit.
 - Insert into `customers` via Supabase and refresh table data.
-**DEPENDENCIES:** US_MD_002.
+**DEPENDENCIES:** US_MDS_002.
 **ACCEPTANCE_CRITERIA:**
 - AC_001: WHEN user submits valid data THEN system creates customer record.
 - AC_002: WHEN required fields are missing THEN inline validation errors are shown.

@@ -31,7 +31,7 @@ export async function createItem(formData: ItemInsert) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/items');
+  revalidatePath('/dashboard/master-data/items');
   return { success: true };
 }
 
@@ -46,7 +46,7 @@ export async function updateItem(id: string, formData: ItemUpdate) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/items');
+  revalidatePath('/dashboard/master-data/items');
   return { success: true };
 }
 
@@ -58,6 +58,6 @@ export async function deleteItem(id: string) {
     return { error: error.message };
   }
 
-  revalidatePath('/master-data/items');
+  revalidatePath('/dashboard/master-data/items');
   return { success: true };
 }

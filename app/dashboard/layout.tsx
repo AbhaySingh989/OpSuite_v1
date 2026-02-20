@@ -8,11 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 
 const data = [
   { icon: IconDashboard, label: 'Dashboard', link: '/dashboard' },
-  { icon: IconDatabase, label: 'Master Data', link: '/master-data' },
-  { icon: IconFileInvoice, label: 'Purchase Orders', link: '/po' },
-  { icon: IconSettings, label: 'Work Orders', link: '/work-orders' },
-  { icon: IconFlask, label: 'Lab Results', link: '/lab-results' },
-  { icon: IconDatabase, label: 'Master Data', link: '/dashboard/master-data' },
+  { icon: IconDatabase, label: 'Master Data', link: '/dashboard/master-data/customers' },
   { icon: IconFileInvoice, label: 'Purchase Orders', link: '/dashboard/po' },
   { icon: IconSettings, label: 'Work Orders', link: '/dashboard/work-orders' },
   { icon: IconFlask, label: 'Lab Results', link: '/dashboard/lab-results' },
