@@ -27,6 +27,7 @@
 ### US_MD_001
 **ID:** US_MD_001
 **TITLE:** Manage Customer Records
+**STATUS:** Completed
 **ACTOR:** Admin, Store Manager
 **PRECONDITION:** User has Admin or Store role.
 **BUSINESS_OBJECTIVE:** Maintain a repository of customers for PO creation.
@@ -61,6 +62,7 @@
 ### US_MD_002
 **ID:** US_MD_002
 **TITLE:** Manage Item Master
+**STATUS:** Completed
 **ACTOR:** Admin, Store Manager
 **PRECONDITION:** User has Admin or Store role.
 **BUSINESS_OBJECTIVE:** Maintain a catalog of items for procurement and production.
@@ -87,6 +89,7 @@
 ### US_MD_003
 **ID:** US_MD_003
 **TITLE:** Manage Standards & Parameters
+**STATUS:** Completed
 **ACTOR:** Admin, QA
 **PRECONDITION:** User has Admin or QA role.
 **BUSINESS_OBJECTIVE:** Define quality standards and their parameters for Lab Validation.
@@ -121,6 +124,7 @@
 ### US_AUTH_001
 **ID:** US_AUTH_001
 **TITLE:** User Login with Email and Password
+**STATUS:** Completed
 **ACTOR:** All Users (Admin, QA, Store)
 **PRECONDITION:** User exists in Supabase Auth and `users` table.
 **BUSINESS_OBJECTIVE:** Securely authenticate users to access the system based on their role and plant.
@@ -147,6 +151,7 @@
 ### US_DASH_001
 **ID:** US_DASH_001
 **TITLE:** View Dashboard Overview
+**STATUS:** Completed
 **ACTOR:** All Users
 **PRECONDITION:** User is logged in.
 **BUSINESS_OBJECTIVE:** Provide a high-level view of plant operations and pending tasks.
@@ -172,6 +177,7 @@
 ### US_PO_001
 **ID:** US_PO_001
 **TITLE:** Create Purchase Order
+**STATUS:** Completed
 **ACTOR:** Store Manager
 **PRECONDITION:** User is logged in. Customers exist.
 **BUSINESS_OBJECTIVE:** Initiate purchase of materials.
@@ -201,6 +207,7 @@
 ### US_WO_001
 **ID:** US_WO_001
 **TITLE:** Create Work Order from PO
+**STATUS:** Completed
 **ACTOR:** Store Manager, Admin
 **PRECONDITION:** PO exists. Items exist.
 **BUSINESS_OBJECTIVE:** Plan production against a PO.
@@ -227,6 +234,7 @@
 ### US_HEAT_001
 **ID:** US_HEAT_001
 **TITLE:** Register Heat & Allocate
+**STATUS:** Completed
 **ACTOR:** Store Manager
 **PRECONDITION:** WO exists.
 **BUSINESS_OBJECTIVE:** Track raw material batch (Heat) used for a WO.
@@ -262,6 +270,7 @@
 ### US_LAB_001
 **ID:** US_LAB_001
 **TITLE:** Enter Lab Results
+**STATUS:** Completed
 **ACTOR:** QA
 **PRECONDITION:** WO status 'lab_pending' (or 'in_production'). Standard assigned to Item (Implicit or Explicit? *Requirement implies Item has Standard, let's assume mapping exists or selected during Lab Entry*).
 **BUSINESS_OBJECTIVE:** Record quality parameters.
@@ -292,6 +301,7 @@
 ### US_LAB_002
 **ID:** US_LAB_002
 **TITLE:** Override Failed Result
+**STATUS:** Completed
 **ACTOR:** QA (with special permission? Req says QA role only).
 **PRECONDITION:** Lab Result Parameter status is 'failed'.
 **BUSINESS_OBJECTIVE:** Allow expert judgment to accept marginal failures.
@@ -318,6 +328,7 @@
 ### US_TC_001
 **ID:** US_TC_001
 **TITLE:** Generate and Issue Test Certificate
+**STATUS:** Completed
 **ACTOR:** QA
 **PRECONDITION:** All parameters Passed or Overridden.
 **BUSINESS_OBJECTIVE:** Generate official quality document (PDF).
@@ -355,6 +366,7 @@
 ### US_INV_001
 **ID:** US_INV_001
 **TITLE:** View Inventory Movements
+**STATUS:** Completed
 **ACTOR:** Store Manager, Admin
 **PRECONDITION:** Movements exist.
 **BUSINESS_OBJECTIVE:** Traceability of materials.
@@ -377,6 +389,7 @@
 ### US_ADM_001
 **ID:** US_ADM_001
 **TITLE:** User Management (Role Assignment)
+**STATUS:** Completed
 **ACTOR:** Admin
 **PRECONDITION:** Admin logged in.
 **BUSINESS_OBJECTIVE:** Assign roles and plants to users.
@@ -405,6 +418,7 @@
 ### US_MDS_001
 **ID:** US_MDS_001
 **TITLE:** View Master Data Screen with Sectioned Navigation
+**STATUS:** Completed
 **ACTOR:** Admin, QA, Store
 **PRECONDITION:** User is logged in and can access `/dashboard/master-data`.
 **BUSINESS_OBJECTIVE:** Provide a single place to access core master data entities.
@@ -426,6 +440,7 @@
 ### US_MDS_002
 **ID:** US_MDS_002
 **TITLE:** View Customers List in Master Data
+**STATUS:** Completed
 **ACTOR:** Admin, QA, Store
 **PRECONDITION:** User is on Master Data screen.
 **BUSINESS_OBJECTIVE:** Allow users to review existing customer records.
@@ -447,6 +462,7 @@
 ### US_MDS_003
 **ID:** US_MDS_003
 **TITLE:** Create Customer from Master Data
+**STATUS:** Completed
 **ACTOR:** Admin, Store
 **PRECONDITION:** User has permission to add customer records.
 **BUSINESS_OBJECTIVE:** Capture new customer master records directly from the UI.
@@ -463,4 +479,94 @@
 **ERROR_SCENARIOS:** Validation failure, duplicate/business constraint conflict, DB error.
 **SECURITY_CONSIDERATIONS:** Create action available only to allowed roles.
 **AUDIT_REQUIREMENTS:** If customer auditing is later enabled, insert actions must be logged.
+**RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.
+
+### US_MDS_004
+**ID:** US_MDS_004
+**TITLE:** View Items List in Master Data
+**STATUS:** Completed
+**ACTOR:** Admin, QA, Store
+**PRECONDITION:** User is on Master Data screen.
+**BUSINESS_OBJECTIVE:** Allow users to review existing item master records.
+**FUNCTIONAL_DESCRIPTION:** User selects Items section and sees item list with key fields.
+**TECHNICAL_SCOPE:**
+- Fetch `items` from Supabase.
+- Render list using Mantine `Table` (`Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`) with project-level sorting/filtering/pagination patterns.
+- Include loading and error states with Mantine `Loader` and notifications.
+**DEPENDENCIES:** US_MDS_001, `items` table.
+**ACCEPTANCE_CRITERIA:**
+- AC_001: WHEN items exist THEN system displays item code, description, and unit.
+- AC_002: WHEN fetch is in progress THEN loading indicator is visible.
+- AC_003: WHEN fetch fails THEN error notification is shown.
+**ERROR_SCENARIOS:** Network failure, permission denied.
+**SECURITY_CONSIDERATIONS:** RLS governs visibility of item rows.
+**AUDIT_REQUIREMENTS:** None for read-only access.
+**RLS_IMPACT:** Query execution must remain RLS-compliant.
+
+### US_MDS_005
+**ID:** US_MDS_005
+**TITLE:** Create Item from Master Data
+**STATUS:** Completed
+**ACTOR:** Admin, Store
+**PRECONDITION:** User has permission to add item records.
+**BUSINESS_OBJECTIVE:** Capture item master records directly from the UI.
+**FUNCTIONAL_DESCRIPTION:** User clicks Add Item, fills form, submits, and sees the new record in the list.
+**TECHNICAL_SCOPE:**
+- Add Mantine `Modal` + `TextInput` form for item fields (`item_code`, `description`, `unit`).
+- Validate required fields client-side before submit.
+- Insert into `items` via Supabase and refresh table data.
+**DEPENDENCIES:** US_MDS_004.
+**ACCEPTANCE_CRITERIA:**
+- AC_001: WHEN user submits valid data THEN system creates item record.
+- AC_002: WHEN required fields are missing THEN inline validation errors are shown.
+- AC_003: WHEN create succeeds THEN success notification is shown and list refreshes.
+- AC_004: WHEN item code is duplicate THEN system shows a duplicate-code error.
+**ERROR_SCENARIOS:** Validation failure, duplicate item code, DB error.
+**SECURITY_CONSIDERATIONS:** Create action available only to allowed roles.
+**AUDIT_REQUIREMENTS:** If item auditing is later enabled, insert actions must be logged.
+**RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.
+
+### US_MDS_006
+**ID:** US_MDS_006
+**TITLE:** View Standards and Parameters in Master Data
+**STATUS:** Completed
+**ACTOR:** Admin, QA, Store
+**PRECONDITION:** User is on Master Data screen.
+**BUSINESS_OBJECTIVE:** Allow users to review quality standards and their linked parameters.
+**FUNCTIONAL_DESCRIPTION:** User selects Standards section and sees standard records with nested/expandable parameters.
+**TECHNICAL_SCOPE:**
+- Fetch `standards` and related `standard_parameters` from Supabase.
+- Render standards list with parameter details using Mantine components (`Table`, `Accordion`, or equivalent current pattern).
+- Include loading and error states with Mantine `Loader` and notifications.
+**DEPENDENCIES:** US_MDS_001, `standards`, `standard_parameters` tables.
+**ACCEPTANCE_CRITERIA:**
+- AC_001: WHEN standards exist THEN system displays standard name and description.
+- AC_002: WHEN a standard has parameters THEN system displays linked parameter name, category, unit, and min/max values.
+- AC_003: WHEN fetch fails THEN error notification is shown.
+**ERROR_SCENARIOS:** Network failure, permission denied.
+**SECURITY_CONSIDERATIONS:** RLS governs visibility of standards and parameter rows.
+**AUDIT_REQUIREMENTS:** None for read-only access.
+**RLS_IMPACT:** Query execution must remain RLS-compliant.
+
+### US_MDS_007
+**ID:** US_MDS_007
+**TITLE:** Create Standard and Parameter from Master Data
+**STATUS:** Completed
+**ACTOR:** Admin, QA
+**PRECONDITION:** User has permission to manage standards.
+**BUSINESS_OBJECTIVE:** Capture quality standards and associated parameters from the UI.
+**FUNCTIONAL_DESCRIPTION:** User creates a Standard and adds one or more Parameters. Newly created entities are visible in standards list.
+**TECHNICAL_SCOPE:**
+- Add Mantine `Modal` forms for standard and parameter creation.
+- Validate required and numeric range fields client-side before submit.
+- Insert into `standards` and `standard_parameters` via Supabase and refresh table data.
+**DEPENDENCIES:** US_MDS_006.
+**ACCEPTANCE_CRITERIA:**
+- AC_001: WHEN user submits valid standard data THEN system creates standard record.
+- AC_002: WHEN user submits valid parameter data THEN system creates parameter linked to selected standard.
+- AC_003: WHEN min value > max value THEN system shows validation error.
+- AC_004: WHEN create succeeds THEN success notification is shown and list refreshes.
+**ERROR_SCENARIOS:** Validation failure, duplicate standard name, DB error.
+**SECURITY_CONSIDERATIONS:** Write actions available only to allowed roles.
+**AUDIT_REQUIREMENTS:** If standards auditing is later enabled, create/update actions must be logged.
 **RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.

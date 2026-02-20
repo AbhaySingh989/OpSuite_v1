@@ -1,27 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import { Table, TextInput, Button, Group, ActionIcon, Modal, Paper, Title, Stack, Badge, Select, NumberInput } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { Table, TextInput, Button, Group, Modal, Paper, Title, Stack, Select, NumberInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconPencil, IconTrash, IconPlus, IconArrowRight } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconArrowRight } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 import { createHeat, allocateHeat } from '@/app/actions/heats';
 import { Database } from '@/types/database.types';
-import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Heat = Database['public']['Tables']['heats']['Row'];
+type WorkOrder = Pick<Database['public']['Tables']['work_orders']['Row'], 'id' | 'wo_number' | 'status'>;
 
 interface HeatListProps {
   initialHeats: Heat[];
+  initialWOs: WorkOrder[];
 }
 
-export function HeatList({ initialHeats }: HeatListProps) {
+export function HeatList({ initialHeats, initialWOs }: HeatListProps) {
+  const router = useRouter();
   const [heats, setHeats] = useState(initialHeats);
   const [openedHeat, { open: openHeat, close: closeHeat }] = useDisclosure(false);
   const [openedAllocate, { open: openAllocate, close: closeAllocate }] = useDisclosure(false);
   const [search, setSearch] = useState('');
   const [selectedHeat, setSelectedHeat] = useState<Heat | null>(null);
+
+  useEffect(() => {
+    setHeats(initialHeats);
+  }, [initialHeats]);
 
   const heatForm = useForm({
     initialValues: {
@@ -63,12 +70,16 @@ export function HeatList({ initialHeats }: HeatListProps) {
       notifications.show({ title: 'Success', message: 'Heat registered', color: 'green' });
       closeHeat();
       heatForm.reset();
-      window.location.reload();
+      router.refresh();
     }
   };
 
   const handleAllocate = async (values: typeof allocateForm.values) => {
     if (!selectedHeat) return;
+    if (values.quantity > (selectedHeat.available_quantity || 0)) {
+      notifications.show({ title: 'Error', message: 'Insufficient Quantity', color: 'red' });
+      return;
+    }
     const res = await allocateHeat(selectedHeat.id, values.wo_id, values.quantity);
     if (res.error) {
       notifications.show({ title: 'Error', message: res.error, color: 'red' });
@@ -76,7 +87,7 @@ export function HeatList({ initialHeats }: HeatListProps) {
       notifications.show({ title: 'Success', message: 'Allocation successful', color: 'green' });
       closeAllocate();
       allocateForm.reset();
-      window.location.reload();
+      router.refresh();
     }
   };
 
@@ -151,7 +162,14 @@ export function HeatList({ initialHeats }: HeatListProps) {
       <Modal opened={openedAllocate} onClose={closeAllocate} title={`Allocate from ${selectedHeat?.heat_number}`}>
         <form onSubmit={allocateForm.onSubmit(handleAllocate)}>
           <Stack gap="sm">
-            <TextInput label="Work Order ID" placeholder="WO-ID (Future Dropdown)" required {...allocateForm.getInputProps('wo_id')} />
+            <Select
+              label="Work Order"
+              placeholder="Select WO"
+              data={initialWOs.map((wo) => ({ value: wo.id, label: `${wo.wo_number} (${wo.status})` }))}
+              required
+              searchable
+              {...allocateForm.getInputProps('wo_id')}
+            />
             <NumberInput
                 label="Quantity"
                 max={selectedHeat?.available_quantity || undefined}

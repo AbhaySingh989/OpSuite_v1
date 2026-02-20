@@ -31,7 +31,7 @@ export default function AuthenticationTitle() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -44,6 +44,34 @@ export default function AuthenticationTitle() {
       });
       setLoading(false);
     } else {
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .select('is_active')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        await supabase.auth.signOut();
+        notifications.show({
+          title: 'Login Failed',
+          message: 'User profile not found. Contact administrator.',
+          color: 'red',
+        });
+        setLoading(false);
+        return;
+      }
+
+      if (!userProfile.is_active) {
+        await supabase.auth.signOut();
+        notifications.show({
+          title: 'Login Failed',
+          message: 'Your account is inactive. Contact administrator.',
+          color: 'red',
+        });
+        setLoading(false);
+        return;
+      }
+
       // Successful login, redirect handled by router or middleware usually,
       // but explicit push here ensures client navigation.
       // Wait, router.push might need a hard refresh for session update if no middleware.
