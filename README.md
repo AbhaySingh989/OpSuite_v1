@@ -191,3 +191,29 @@ For issues, please check the deployment logs in Vercel or the database logs in S
 
 ### Dashboard
 - View summary cards and sidebar navigation.
+
+
+---
+
+## Implemented Features
+
+### Master Data
+- **Customers**: Manage customer records.
+- **Items**: Manage item catalog.
+- **Standards**: Define quality standards and parameters.
+
+### Procurement & Production
+- **Purchase Orders (PO)**: Create and manage POs.
+- **Work Orders (WO)**: Create WOs linked to POs and Items.
+- **Heat Registry**: Register raw material heats and allocate to WOs.
+
+### Quality Control
+- **Lab Results**: Enter quality data against defined standards. Auto-validation (Pass/Fail). Override capability for QA.
+- **Test Certificates (TC)**: Generate and issue TCs for passed/overridden WOs.
+
+### Inventory & Admin
+- **Movements**: View audit trail of inventory allocation.
+- **User Management**: Assign Roles and Plants to users.
+
+## Testing
+- Run integration tests: `npm test`
