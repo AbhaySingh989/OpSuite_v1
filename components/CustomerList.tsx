@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, TextInput, Button, Group, ActionIcon, Modal, Paper, Title, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconSearch, IconPencil, IconTrash, IconPlus } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
+import { useRouter } from 'next/navigation';
 import { createCustomer, updateCustomer, deleteCustomer } from '@/app/actions/customers';
 import { Database } from '@/types/database.types';
 
@@ -16,10 +17,15 @@ interface CustomerListProps {
 }
 
 export function CustomerList({ initialCustomers }: CustomerListProps) {
+  const router = useRouter();
   const [customers, setCustomers] = useState(initialCustomers);
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState('');
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+
+  useEffect(() => {
+    setCustomers(initialCustomers);
+  }, [initialCustomers]);
 
   const form = useForm({
     initialValues: {
@@ -66,6 +72,7 @@ export function CustomerList({ initialCustomers }: CustomerListProps) {
         notifications.show({ title: 'Success', message: 'Customer created', color: 'green' });
       }
       close();
+      router.refresh();
     } catch (error: any) {
       notifications.show({ title: 'Error', message: error.message || 'Operation failed', color: 'red' });
     }
@@ -78,6 +85,7 @@ export function CustomerList({ initialCustomers }: CustomerListProps) {
         notifications.show({ title: 'Error', message: res.error, color: 'red' });
       } else {
         notifications.show({ title: 'Success', message: 'Customer deleted', color: 'green' });
+        router.refresh();
       }
     }
   };
