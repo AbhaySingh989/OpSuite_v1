@@ -1,4 +1,3 @@
-import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToBuffer } from '@react-pdf/renderer';
 import { createClient } from '@/utils/supabase/server';
@@ -88,15 +87,15 @@ export async function GET(
   }
 
   const pdfBuffer = await renderToBuffer(
-    React.createElement(TCDocument, {
-      tcId: params.tcId,
-      version,
-      woNumber: wo?.wo_number || '-',
-      poNumber: po?.po_number || null,
-      customerName: customer?.name || null,
-      generatedAt: versionRow.generated_at || new Date().toISOString(),
-      parameters,
-    })
+    <TCDocument
+      tcId={params.tcId}
+      version={version}
+      woNumber={wo?.wo_number || '-'}
+      poNumber={po?.po_number || null}
+      customerName={customer?.name || null}
+      generatedAt={versionRow.generated_at || new Date().toISOString()}
+      parameters={parameters}
+    />
   );
 
   return new NextResponse(pdfBuffer as any, {
