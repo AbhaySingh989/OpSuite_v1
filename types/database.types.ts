@@ -484,6 +484,7 @@ export interface Database {
           plant_id: string
           work_order_id: string | null
           current_version: number
+          tc_type: string | null
           status: 'prepared' | 'approved' | 'issued'
           created_at: string
           created_by: string | null
@@ -496,6 +497,7 @@ export interface Database {
           plant_id: string
           work_order_id?: string | null
           current_version?: number
+          tc_type?: string | null
           status?: 'prepared' | 'approved' | 'issued'
           created_at?: string
           created_by?: string | null
@@ -508,6 +510,7 @@ export interface Database {
           plant_id?: string
           work_order_id?: string | null
           current_version?: number
+          tc_type?: string | null
           status?: 'prepared' | 'approved' | 'issued'
           created_at?: string
           created_by?: string | null
