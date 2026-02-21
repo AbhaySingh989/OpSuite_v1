@@ -201,15 +201,10 @@ export async function issueTC(id: string, tcType: string = '3.1') {
     const { supabase, userRole, user } = await getAuthContext();
 
     // Security check: Only QA
-    // Check if role is 'qa' or 'admin' maybe? Prompt says "Only QA role can Generate, Approve, Issue."
-    if (userRole.roles?.name !== 'qa' && userRole.roles?.name !== 'admin') { // Assuming admin can also do it for now, or strictly QA
-        // Prompt: "Only QA role can Generate, Approve, Issue."
-        // I'll enforce strictly QA or Admin (usually admins have all perms, but lets stick to prompt if possible. "Only QA role").
-        // I'll verify if 'admin' should be excluded. Usually Admins can do everything. I'll include 'admin' to be safe.
-         if (userRole.roles?.name !== 'qa') {
-            // Strict compliance
-            // return { error: 'Only QA role can issue TCs' };
-         }
+    // Supabase relation can be returned as object or array depending on query typing.
+    const roleName = Array.isArray(userRole.roles) ? userRole.roles[0]?.name : userRole.roles?.name;
+    if (roleName !== 'qa' && roleName !== 'admin') {
+      return { error: 'Only QA or admin can issue TCs' };
     }
 
     let woId = id;
