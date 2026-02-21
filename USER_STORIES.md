@@ -176,22 +176,25 @@
 
 ### US_PO_001
 **ID:** US_PO_001
-**TITLE:** Create Purchase Order
-**STATUS:** Completed
+**TITLE:** Create Purchase Order with Automated Workflow
+**STATUS:** Updated
 **ACTOR:** Store Manager
 **PRECONDITION:** User is logged in. Customers exist.
 **BUSINESS_OBJECTIVE:** Initiate purchase of materials.
-**FUNCTIONAL_DESCRIPTION:** User creates a PO header.
+**FUNCTIONAL_DESCRIPTION:** User creates a PO header. The PO status is automatically set to 'draft'. User cannot manually change the status.
 **TECHNICAL_SCOPE:**
 - **UI**: `/dashboard/po/page.tsx` (List + Create flow).
     - Fields: PO Number, Customer (Dropdown), Order Date.
     - Status defaults to 'draft'.
+    - Status column in list should show a visual indicator (e.g. Stepper).
 - **Backend**: `createPO` action.
 **DEPENDENCIES:** Customers.
 **ACCEPTANCE_CRITERIA:**
 - AC_001: WHEN form submitted THEN PO created in 'draft'.
 - AC_002: WHEN PO Number exists THEN error.
 - AC_003: WHEN created THEN `plant_id` is set to user's plant.
+- AC_004: WHEN viewing PO list THEN status is displayed as a visual indicator (not just text).
+- AC_005: User MUST NOT be able to manually edit the status field.
 **ERROR_SCENARIOS:** Duplicate PO.
 **SECURITY_CONSIDERATIONS:** Plant RLS.
 **AUDIT_REQUIREMENTS:** Trigger.
@@ -202,12 +205,14 @@
 3. Select Customer "Test Customer".
 4. Enter PO "PO-1001", Date "Today".
 5. Save. Verify redirection to PO List.
+6. Verify no edit button exists for Status.
+
 ## Module: Work Orders
 
 ### US_WO_001
 **ID:** US_WO_001
-**TITLE:** Create Work Order from PO
-**STATUS:** Completed
+**TITLE:** Create Work Order from PO with Automated Workflow
+**STATUS:** Updated
 **ACTOR:** Store Manager, Admin
 **PRECONDITION:** PO exists. Items exist.
 **BUSINESS_OBJECTIVE:** Plan production against a PO.
@@ -219,6 +224,8 @@
 **ACCEPTANCE_CRITERIA:**
 - AC_001: WHEN valid inputs THEN WO created with status 'draft'.
 - AC_002: WHEN PO is selected THEN linked correctly.
+- AC_003: User MUST NOT be able to manually edit the status field.
+- AC_004: Status progression is visible via a Stepper or similar UI component.
 **ERROR_SCENARIOS:** Invalid Item/PO.
 **SECURITY_CONSIDERATIONS:** Plant RLS.
 **AUDIT_REQUIREMENTS:** Trigger.
@@ -230,6 +237,7 @@
 4. Select Item "ITEM-001".
 5. Enter WO "WO-2001", Qty 100.
 6. Save. Verify in list.
+7. Verify visual status indicator.
 
 ### US_HEAT_001
 **ID:** US_HEAT_001
@@ -413,160 +421,37 @@
 
 ---
 
-## Module: Master Data Screen
+## Epic 5: Production Entry
 
-### US_MDS_001
-**ID:** US_MDS_001
-**TITLE:** View Master Data Screen with Sectioned Navigation
-**STATUS:** Completed
-**ACTOR:** Admin, QA, Store
-**PRECONDITION:** User is logged in and can access `/dashboard/master-data`.
-**BUSINESS_OBJECTIVE:** Provide a single place to access core master data entities.
-**FUNCTIONAL_DESCRIPTION:** User opens Master Data screen and sees sectioned navigation for Customers, Items, and Standards.
+### US_PROD_001
+**ID:** US_PROD_001
+**TITLE:** Production Entry (Group Entry)
+**STATUS:** To Do
+**ACTOR:** Production Manager, Shop Floor Operator
+**PRECONDITION:** Work Orders exist in 'in_production' or 'draft' state (depending on workflow).
+**BUSINESS_OBJECTIVE:** Allow shop floor users to report production quantities for multiple Work Orders simultaneously to save time.
+**FUNCTIONAL_DESCRIPTION:** User opens "Production Entry" screen. System displays a table of active Work Orders. User enters "Produced Qty" and "Rejection Qty" for one or more WOs and clicks "Update Production".
 **TECHNICAL_SCOPE:**
-- Implement `app/dashboard/master-data/page.tsx` with Mantine `Tabs` and `Card` layout.
-- Use Mantine responsive patterns for desktop/mobile rendering.
-- Show placeholder-empty states per section until data is fetched.
-**DEPENDENCIES:** US_AUTH_001, US_DASH_001.
+- **UI**: `/dashboard/production-entry/page.tsx`
+    - Table listing active WOs.
+    - Editable inputs for "Produced Qty" and "Rejection Qty".
+    - "Update" button (Batch action).
+- **Backend**: `updateProduction` server action.
+    - Updates WO status to 'lab_pending' (if production complete) or keeps 'in_production'.
+    - Updates produced quantity.
+**DEPENDENCIES:** WO creation.
 **ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user opens Master Data THEN system shows tabs for Customers, Items, Standards.
-- AC_002: WHEN user switches tab THEN the selected section content is displayed without route change.
-- AC_003: WHEN no data exists THEN system shows clear empty-state message in that section.
-**ERROR_SCENARIOS:** Screen load failure.
-**SECURITY_CONSIDERATIONS:** Route accessible only to authenticated users.
-**AUDIT_REQUIREMENTS:** None for read-only tab switching.
-**RLS_IMPACT:** Read queries must respect RLS policies.
-
-### US_MDS_002
-**ID:** US_MDS_002
-**TITLE:** View Customers List in Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, QA, Store
-**PRECONDITION:** User is on Master Data screen.
-**BUSINESS_OBJECTIVE:** Allow users to review existing customer records.
-**FUNCTIONAL_DESCRIPTION:** User selects Customers tab and sees customer list with key fields.
-**TECHNICAL_SCOPE:**
-- Fetch `customers` from Supabase.
-- Render list using Mantine `Table` (`Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`) with project-level sorting/filtering/pagination patterns.
-- Include loading and error states with Mantine `Loader` and notifications.
-**DEPENDENCIES:** US_MDS_001, `customers` table.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN customers exist THEN system displays name, contact, email, and phone.
-- AC_002: WHEN fetch is in progress THEN loading indicator is visible.
-- AC_003: WHEN fetch fails THEN error notification is shown.
-**ERROR_SCENARIOS:** Network failure, permission denied.
-**SECURITY_CONSIDERATIONS:** RLS governs visibility of customer rows.
-**AUDIT_REQUIREMENTS:** None for read-only access.
-**RLS_IMPACT:** Query execution must remain RLS-compliant.
-
-### US_MDS_003
-**ID:** US_MDS_003
-**TITLE:** Create Customer from Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, Store
-**PRECONDITION:** User has permission to add customer records.
-**BUSINESS_OBJECTIVE:** Capture new customer master records directly from the UI.
-**FUNCTIONAL_DESCRIPTION:** User clicks Add Customer, fills form, submits, and sees the new record in the list.
-**TECHNICAL_SCOPE:**
-- Add Mantine `Modal` + `TextInput` form for customer fields.
-- Validate required fields client-side before submit.
-- Insert into `customers` via Supabase and refresh table data.
-**DEPENDENCIES:** US_MDS_002.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user submits valid data THEN system creates customer record.
-- AC_002: WHEN required fields are missing THEN inline validation errors are shown.
-- AC_003: WHEN create succeeds THEN success notification is shown and list refreshes.
-**ERROR_SCENARIOS:** Validation failure, duplicate/business constraint conflict, DB error.
-**SECURITY_CONSIDERATIONS:** Create action available only to allowed roles.
-**AUDIT_REQUIREMENTS:** If customer auditing is later enabled, insert actions must be logged.
-**RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.
-
-### US_MDS_004
-**ID:** US_MDS_004
-**TITLE:** View Items List in Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, QA, Store
-**PRECONDITION:** User is on Master Data screen.
-**BUSINESS_OBJECTIVE:** Allow users to review existing item master records.
-**FUNCTIONAL_DESCRIPTION:** User selects Items section and sees item list with key fields.
-**TECHNICAL_SCOPE:**
-- Fetch `items` from Supabase.
-- Render list using Mantine `Table` (`Table.Thead`, `Table.Tbody`, `Table.Tr`, `Table.Th`, `Table.Td`) with project-level sorting/filtering/pagination patterns.
-- Include loading and error states with Mantine `Loader` and notifications.
-**DEPENDENCIES:** US_MDS_001, `items` table.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN items exist THEN system displays item code, description, and unit.
-- AC_002: WHEN fetch is in progress THEN loading indicator is visible.
-- AC_003: WHEN fetch fails THEN error notification is shown.
-**ERROR_SCENARIOS:** Network failure, permission denied.
-**SECURITY_CONSIDERATIONS:** RLS governs visibility of item rows.
-**AUDIT_REQUIREMENTS:** None for read-only access.
-**RLS_IMPACT:** Query execution must remain RLS-compliant.
-
-### US_MDS_005
-**ID:** US_MDS_005
-**TITLE:** Create Item from Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, Store
-**PRECONDITION:** User has permission to add item records.
-**BUSINESS_OBJECTIVE:** Capture item master records directly from the UI.
-**FUNCTIONAL_DESCRIPTION:** User clicks Add Item, fills form, submits, and sees the new record in the list.
-**TECHNICAL_SCOPE:**
-- Add Mantine `Modal` + `TextInput` form for item fields (`item_code`, `description`, `unit`).
-- Validate required fields client-side before submit.
-- Insert into `items` via Supabase and refresh table data.
-**DEPENDENCIES:** US_MDS_004.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user submits valid data THEN system creates item record.
-- AC_002: WHEN required fields are missing THEN inline validation errors are shown.
-- AC_003: WHEN create succeeds THEN success notification is shown and list refreshes.
-- AC_004: WHEN item code is duplicate THEN system shows a duplicate-code error.
-**ERROR_SCENARIOS:** Validation failure, duplicate item code, DB error.
-**SECURITY_CONSIDERATIONS:** Create action available only to allowed roles.
-**AUDIT_REQUIREMENTS:** If item auditing is later enabled, insert actions must be logged.
-**RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.
-
-### US_MDS_006
-**ID:** US_MDS_006
-**TITLE:** View Standards and Parameters in Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, QA, Store
-**PRECONDITION:** User is on Master Data screen.
-**BUSINESS_OBJECTIVE:** Allow users to review quality standards and their linked parameters.
-**FUNCTIONAL_DESCRIPTION:** User selects Standards section and sees standard records with nested/expandable parameters.
-**TECHNICAL_SCOPE:**
-- Fetch `standards` and related `standard_parameters` from Supabase.
-- Render standards list with parameter details using Mantine components (`Table`, `Accordion`, or equivalent current pattern).
-- Include loading and error states with Mantine `Loader` and notifications.
-**DEPENDENCIES:** US_MDS_001, `standards`, `standard_parameters` tables.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN standards exist THEN system displays standard name and description.
-- AC_002: WHEN a standard has parameters THEN system displays linked parameter name, category, unit, and min/max values.
-- AC_003: WHEN fetch fails THEN error notification is shown.
-**ERROR_SCENARIOS:** Network failure, permission denied.
-**SECURITY_CONSIDERATIONS:** RLS governs visibility of standards and parameter rows.
-**AUDIT_REQUIREMENTS:** None for read-only access.
-**RLS_IMPACT:** Query execution must remain RLS-compliant.
-
-### US_MDS_007
-**ID:** US_MDS_007
-**TITLE:** Create Standard and Parameter from Master Data
-**STATUS:** Completed
-**ACTOR:** Admin, QA
-**PRECONDITION:** User has permission to manage standards.
-**BUSINESS_OBJECTIVE:** Capture quality standards and associated parameters from the UI.
-**FUNCTIONAL_DESCRIPTION:** User creates a Standard and adds one or more Parameters. Newly created entities are visible in standards list.
-**TECHNICAL_SCOPE:**
-- Add Mantine `Modal` forms for standard and parameter creation.
-- Validate required and numeric range fields client-side before submit.
-- Insert into `standards` and `standard_parameters` via Supabase and refresh table data.
-**DEPENDENCIES:** US_MDS_006.
-**ACCEPTANCE_CRITERIA:**
-- AC_001: WHEN user submits valid standard data THEN system creates standard record.
-- AC_002: WHEN user submits valid parameter data THEN system creates parameter linked to selected standard.
-- AC_003: WHEN min value > max value THEN system shows validation error.
-- AC_004: WHEN create succeeds THEN success notification is shown and list refreshes.
-**ERROR_SCENARIOS:** Validation failure, duplicate standard name, DB error.
-**SECURITY_CONSIDERATIONS:** Write actions available only to allowed roles.
-**AUDIT_REQUIREMENTS:** If standards auditing is later enabled, create/update actions must be logged.
-**RLS_IMPACT:** Insert/update behavior must be compatible with existing policies.
+- AC_001: WHEN user views screen THEN system lists all active WOs.
+- AC_002: WHEN user enters quantity and submits THEN WO produced_qty is updated.
+- AC_003: WHEN production is reported THEN WO status might change (e.g. to 'lab_pending' if threshold met).
+- AC_004: UI must support bulk updates (multiple rows at once).
+**ERROR_SCENARIOS:** Input negative values. Input > Planned Qty (warning or error).
+**SECURITY_CONSIDERATIONS:** Production/Admin role only.
+**AUDIT_REQUIREMENTS:** Trigger enabled.
+**RLS_IMPACT:** Plant RLS.
+**AGENT_TESTING_CRITERIA:**
+1. Navigate to `/dashboard/production-entry`.
+2. Locate "WO-2001".
+3. Enter Produced: 50.
+4. Click "Update".
+5. Verify WO status/quantity updated.
