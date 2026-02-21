@@ -10,6 +10,9 @@ export type TCParameter = {
   validation_status: string;
 };
 
+// Backward-compatible alias for older imports.
+export type TCParameterRow = TCParameter;
+
 export type TCData = {
   tc_number: string;
   version: number;
