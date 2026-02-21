@@ -1,7 +1,17 @@
 'use client';
-import { AppShell, Burger, Group, UnstyledButton, Text, ThemeIcon, Stack } from '@mantine/core';
+
+import { AppShell, Burger, Group, NavLink, Text, ThemeIcon, Stack, ScrollArea, Avatar } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconDashboard, IconDatabase, IconFileInvoice, IconFlask, IconSettings, IconLogout } from '@tabler/icons-react';
+import {
+  IconDashboard,
+  IconDatabase,
+  IconFileInvoice,
+  IconFlask,
+  IconSettings,
+  IconLogout,
+  IconHammer,
+  IconBuildingFactory
+} from '@tabler/icons-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -11,10 +21,11 @@ const data = [
   { icon: IconDatabase, label: 'Master Data', link: '/dashboard/master-data' },
   { icon: IconFileInvoice, label: 'Purchase Orders', link: '/dashboard/po' },
   { icon: IconSettings, label: 'Work Orders', link: '/dashboard/work-orders' },
+  { icon: IconHammer, label: 'Production Entry', link: '/dashboard/production-entry' },
   { icon: IconFlask, label: 'Lab Results', link: '/dashboard/lab-results' },
 ];
 
-function NavLinks() {
+function NavLinks({ closeMobile }: { closeMobile: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -26,39 +37,34 @@ function NavLinks() {
   };
 
   const links = data.map((item) => (
-    <UnstyledButton
+    <NavLink
       component={Link}
       href={item.link}
       key={item.label}
-      style={{
-        display: 'block',
-        width: '100%',
-        padding: '10px',
-        borderRadius: '8px',
-        backgroundColor: pathname === item.link ? 'var(--mantine-color-blue-light)' : 'transparent',
-        color: pathname === item.link ? 'var(--mantine-color-blue-filled)' : 'inherit',
-      }}
-    >
-      <Group>
-        <ThemeIcon color={pathname === item.link ? 'blue' : 'gray'} variant="light">
-          <item.icon size={16} />
-        </ThemeIcon>
-        <Text size="sm">{item.label}</Text>
-      </Group>
-    </UnstyledButton>
+      active={pathname === item.link}
+      label={item.label}
+      leftSection={<item.icon size={20} stroke={1.5} />}
+      onClick={closeMobile}
+      variant="light"
+      color="blue"
+      style={{ borderRadius: 'var(--mantine-radius-md)' }}
+    />
   ));
 
   return (
     <Stack justify="space-between" h="100%">
-        <Stack gap="xs">{links}</Stack>
-        <UnstyledButton onClick={handleLogout} style={{ padding: '10px' }}>
-            <Group>
-                <ThemeIcon color="red" variant="light">
-                    <IconLogout size={16} />
-                </ThemeIcon>
-                <Text size="sm" c="red">Logout</Text>
-            </Group>
-        </UnstyledButton>
+        <Stack gap="xs">
+          {links}
+        </Stack>
+        <NavLink
+            label="Logout"
+            leftSection={<IconLogout size={20} stroke={1.5} />}
+            onClick={handleLogout}
+            color="red"
+            variant="subtle"
+            style={{ borderRadius: 'var(--mantine-radius-md)' }}
+            c="red"
+        />
     </Stack>
   );
 }
@@ -68,27 +74,35 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [opened, { toggle }] = useDisclosure();
+  const [opened, { toggle, close }] = useDisclosure();
 
   return (
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: 300,
+        width: 280,
         breakpoint: 'sm',
         collapsed: { mobile: !opened },
       }}
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Text fw={700} size="lg">OpSuite ERP</Text>
+        <Group h="100%" px="md" justify="space-between">
+          <Group>
+            <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <ThemeIcon size="lg" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>
+                <IconBuildingFactory size={20} />
+            </ThemeIcon>
+            <Text fw={700} size="lg">OpSuite ERP</Text>
+          </Group>
+          {/* Add user avatar or profile here later */}
         </Group>
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        <NavLinks />
+        <ScrollArea>
+           <NavLinks closeMobile={close} />
+        </ScrollArea>
       </AppShell.Navbar>
 
       <AppShell.Main>{children}</AppShell.Main>
