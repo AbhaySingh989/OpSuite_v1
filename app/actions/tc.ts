@@ -1,10 +1,11 @@
 'use server';
 
 import { createClient } from '@/utils/supabase/server';
-import { TCData, TCParameter } from '@/components/pdf/TCDocument';
-import { renderToBuffer } from '@react-pdf/renderer';
-import React from 'react';
+import { TCData } from '@/components/pdf/TCDocument';
+import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer';
 import TCDocument from '@/components/pdf/TCDocument';
+import { revalidatePath } from 'next/cache';
+import type { ReactElement } from 'react';
 
 // Helper to get authenticated client and plant_id
 async function getAuthContext() {
@@ -180,7 +181,8 @@ export async function generateTCPreview(woId: string, tcType: string) {
     if (error || !data) throw new Error(error || 'Failed to fetch data');
 
     // Render PDF to Buffer
-    const buffer = await renderToBuffer(React.createElement(TCDocument, { data }));
+    const pdfDoc = TCDocument({ data }) as unknown as ReactElement<DocumentProps>;
+    const buffer = await renderToBuffer(pdfDoc);
     const base64 = buffer.toString('base64');
 
     return { pdfBase64: base64 };
@@ -189,7 +191,12 @@ export async function generateTCPreview(woId: string, tcType: string) {
   }
 }
 
-export async function issueTC(woId: string, tcType: string) {
+// Backward-compatible action used by the existing dashboard.
+export async function generateTC(woId: string) {
+  return generateTCPreview(woId, '3.1');
+}
+
+export async function issueTC(id: string, tcType: string = '3.1') {
   try {
     const { supabase, userRole, user } = await getAuthContext();
 
@@ -205,11 +212,29 @@ export async function issueTC(woId: string, tcType: string) {
          }
     }
 
+    let woId = id;
+    const { data: woById } = await supabase.from('work_orders').select('id').eq('id', id).single();
+    if (!woById) {
+      const { data: tcById } = await supabase
+        .from('test_certificates')
+        .select('work_order_id, tc_type')
+        .eq('id', id)
+        .single();
+
+      if (!tcById?.work_order_id) {
+        throw new Error('Work order or Test Certificate not found');
+      }
+
+      woId = tcById.work_order_id;
+      tcType = tcById.tc_type || tcType;
+    }
+
     const { data, error } = await getTCData(woId, tcType);
     if (error || !data) throw new Error(error || 'Failed to fetch data');
 
     // Render PDF
-    const buffer = await renderToBuffer(React.createElement(TCDocument, { data }));
+    const pdfDoc = TCDocument({ data }) as unknown as ReactElement<DocumentProps>;
+    const buffer = await renderToBuffer(pdfDoc);
 
     // Upload to Storage
     const fileName = `tc-${data.tc_number}-v${data.version}.pdf`;
