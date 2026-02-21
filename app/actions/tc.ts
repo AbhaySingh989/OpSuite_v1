@@ -201,8 +201,14 @@ export async function issueTC(id: string, tcType: string = '3.1') {
     const { supabase, userRole, user } = await getAuthContext();
 
     // Security check: Only QA
-    // Supabase relation can be returned as object or array depending on query typing.
-    const roleName = Array.isArray(userRole.roles) ? userRole.roles[0]?.name : userRole.roles?.name;
+    const rolesRaw = userRole.roles as unknown;
+    let roleName: string | undefined;
+    if (Array.isArray(rolesRaw)) {
+      const firstRole = rolesRaw[0] as { name?: string } | undefined;
+      roleName = firstRole?.name;
+    } else if (rolesRaw && typeof rolesRaw === 'object') {
+      roleName = (rolesRaw as { name?: string }).name;
+    }
     if (roleName !== 'qa' && roleName !== 'admin') {
       return { error: 'Only QA or admin can issue TCs' };
     }
