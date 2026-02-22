@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Table,
   TextInput,
@@ -22,8 +22,6 @@ import { IconSearch, IconPlus, IconCheck, IconClock, IconFlask, IconHammer } fro
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
 import { createWO } from '@/app/actions/wo';
-import { getPOs } from '@/app/actions/po';
-import { getItems } from '@/app/actions/items';
 import { Database } from '@/types/database.types';
 
 type WO = Database['public']['Tables']['work_orders']['Row'] & {
@@ -35,6 +33,8 @@ type Item = Database['public']['Tables']['items']['Row'];
 
 interface WOListProps {
   initialWOs: WO[];
+  pos: PO[];
+  items: Item[];
 }
 
 const STATUS_STEPS = ['draft', 'in_production', 'lab_pending', 'completed'];
@@ -85,10 +85,8 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function WOList({ initialWOs }: WOListProps) {
+export function WOList({ initialWOs, pos, items }: WOListProps) {
   const [wos, setWOs] = useState(initialWOs);
-  const [pos, setPOs] = useState<PO[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState('');
 
@@ -106,11 +104,6 @@ export function WOList({ initialWOs }: WOListProps) {
       quantity: (value) => (value > 0 ? null : 'Quantity must be positive'),
     },
   });
-
-  useEffect(() => {
-    getPOs().then(setPOs);
-    getItems().then(setItems);
-  }, []);
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
