@@ -52,6 +52,7 @@ export async function getCompletedWorkOrders() {
 export async function getTCData(woId: string, tcType: string): Promise<{ data?: TCData, error?: string }> {
    try {
     const { supabase, userRole, user } = await getAuthContext();
+    if (!user) return { error: 'Unauthorized' };
 
     // 1. Fetch Work Order Details
     const { data: wo, error: woError } = await supabase
@@ -199,6 +200,7 @@ export async function generateTC(woId: string) {
 export async function issueTC(id: string, tcType: string = '3.1') {
   try {
     const { supabase, userRole, user } = await getAuthContext();
+    if (!user) return { error: 'Unauthorized' };
 
     // Security check: Only QA
     const rolesRaw = userRole.roles as unknown;
