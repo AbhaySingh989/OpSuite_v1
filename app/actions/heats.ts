@@ -73,7 +73,13 @@ export async function allocateHeat(heatId: string, woId: string, quantity: numbe
 
 export async function getHeats() {
   const supabase = createClient();
-  const { data, error } = await supabase.from('heats').select('*').order('created_at', { ascending: false });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: userRole } = await supabase.from('user_roles').select('plant_id').eq('user_id', user.id).single();
+  if (!userRole) return [];
+
+  const { data, error } = await supabase.from('heats').select('*').eq('plant_id', userRole.plant_id).order('created_at', { ascending: false });
   if (error) return [];
   return data;
 }
