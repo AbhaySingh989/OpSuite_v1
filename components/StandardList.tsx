@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Table, TextInput, Button, Group, ActionIcon, Modal, Paper, Title, Stack, Text, NumberInput, Select, Accordion } from '@mantine/core';
+import { Table, TextInput, Button, Group, ActionIcon, Modal, Title, Stack, Text, NumberInput, Select, Accordion } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconSearch, IconTrash, IconPlus } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
