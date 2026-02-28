@@ -25,6 +25,10 @@ async function getAuthContext() {
 }
 
 export async function getCompletedWorkOrders() {
+  const authClient = createClient();
+  const { data: { user }, error: authError } = await authClient.auth.getUser();
+  if (authError || !user) return { data: [] };
+
   try {
     const { supabase, userRole } = await getAuthContext();
 
@@ -45,6 +49,9 @@ export async function getCompletedWorkOrders() {
     if (error) throw new Error(error.message);
     return { data };
   } catch (e: any) {
+    if (e.message === 'Unauthorized' || e.message === 'No plant assigned or role found') {
+      return { data: [] };
+    }
     return { error: e.message };
   }
 }
