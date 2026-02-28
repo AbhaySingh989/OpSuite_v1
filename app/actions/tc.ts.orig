@@ -85,7 +85,6 @@ export async function getTCData(woId: string, tcType: string): Promise<{ data?: 
           standard_parameters (*)
         )
       `)
-      .eq('plant_id', userRole.plant_id)
       .eq('work_order_id', woId)
       .single();
 
@@ -114,7 +113,6 @@ export async function getTCData(woId: string, tcType: string): Promise<{ data?: 
         *,
         heats (*)
       `)
-      .eq('plant_id', userRole.plant_id)
       .eq('work_order_id', woId)
       .eq('movement_type', 'allocation')
       .single();
@@ -134,7 +132,6 @@ export async function getTCData(woId: string, tcType: string): Promise<{ data?: 
     const { data: existingTC } = await supabase
       .from('test_certificates')
       .select('*')
-      .eq('plant_id', userRole.plant_id)
       .eq('work_order_id', woId)
       .single();
 
@@ -227,7 +224,6 @@ export async function issueTC(id: string, tcType: string = '3.1') {
       const { data: tcById } = await supabase
         .from('test_certificates')
         .select('work_order_id, tc_type')
-        .eq('plant_id', userRole.plant_id)
         .eq('id', id)
         .single();
 

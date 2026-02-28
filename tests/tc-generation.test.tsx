@@ -89,7 +89,7 @@ describe('TC Generation Module', () => {
   });
 
   it('should block TC generation if lab results have failures without override', async () => {
-     const mockWO = { status: 'completed', wo_number: 'WO-1', purchase_orders: { customers: { name: 'Cust' } } };
+     const mockWO = { plant_id: 'p1', status: 'completed', wo_number: 'WO-1', purchase_orders: { customers: { name: 'Cust' } } };
      const mockLab = {
         lab_result_parameters: [
            { validation_status: 'failed', override_flag: false, standard_parameters: { parameter_name: 'Carbon' } }
@@ -110,7 +110,7 @@ describe('TC Generation Module', () => {
   });
 
   it('should allow TC generation if lab results failed but have override', async () => {
-      const mockWO = { status: 'completed', wo_number: 'WO-1', quantity: 100, purchase_orders: { customers: { name: 'Cust' } }, items: { item_code: 'Item1' } };
+      const mockWO = { plant_id: 'p1', status: 'completed', wo_number: 'WO-1', quantity: 100, purchase_orders: { customers: { name: 'Cust' } }, items: { item_code: 'Item1' } };
       const mockLab = {
          tested_by: 'user-1',
          lab_result_parameters: [
@@ -139,7 +139,7 @@ describe('TC Generation Module', () => {
    });
 
    it('should increment version if TC already exists', async () => {
-      const mockWO = { status: 'completed', wo_number: 'WO-1', quantity: 100 };
+      const mockWO = { plant_id: 'p1', status: 'completed', wo_number: 'WO-1', quantity: 100 };
       const mockLab = { tested_by: 'u1', lab_result_parameters: [] };
       const mockAlloc = { heats: {} };
       const mockPlant = { name: 'P1' };
