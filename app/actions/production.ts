@@ -32,30 +32,50 @@ export async function updateProduction(updates: ProductionUpdate[]) {
   // RLS will handle plant_id checks ideally, but we rely on the session.
   // We process updates sequentially or in parallel.
 
-  const results = await Promise.all(updates.map(async (update) => {
-    // Note: produced_quantity and rejected_quantity columns are assumed to exist
-    // or we might need to store this elsewhere if schema is rigid.
-    // For this implementation, we assume schema has been migrated.
+  if (updates.length === 0) return { success: true };
 
-    // We also update status.
-    const { error } = await supabase
-      .from('work_orders')
-      .update({
-        status: update.status as any,
-        // @ts-ignore: Assuming column exists
-        produced_quantity: update.produced_qty,
-        // @ts-ignore: Assuming column exists
-        rejected_quantity: update.rejection_qty
-      })
-      .eq('id', update.wo_id);
+  // Fetch only necessary NOT NULL columns (e.g., plant_id) for the upsert payload to satisfy constraints and RLS
+  const { data: existingWOs, error: fetchError } = await supabase
+    .from('work_orders')
+    .select('*')
+    .in(
+      'id',
+      updates.map((u) => u.wo_id)
+    );
 
-    return error;
-  }));
+  if (fetchError || !existingWOs) {
+    return { error: 'Failed to fetch existing work orders for update' };
+  }
 
-  const errors = results.filter(Boolean);
+  // Construct upsert data containing only the primary key, required constraints, and modified columns
+  const upsertData: any[] = [];
+  const missingWOs: string[] = [];
 
-  if (errors.length > 0) {
-    return { error: 'Some updates failed' };
+  for (const update of updates) {
+    const existing = existingWOs.find((wo) => wo.id === update.wo_id);
+    if (!existing) {
+      missingWOs.push(update.wo_id);
+      continue;
+    }
+
+    upsertData.push({
+      ...existing,
+      status: update.status as any,
+      produced_quantity: update.produced_qty,
+      rejected_quantity: update.rejection_qty,
+    });
+  }
+
+  if (missingWOs.length > 0) {
+    return { error: 'Some work orders were not found: ' + missingWOs.join(', ') };
+  }
+
+  const { error: upsertError } = await supabase
+    .from('work_orders')
+    .upsert(upsertData, { onConflict: 'id' });
+
+  if (upsertError) {
+    return { error: 'Some updates failed: ' + upsertError.message };
   }
 
   revalidatePath('/dashboard/production-entry');
