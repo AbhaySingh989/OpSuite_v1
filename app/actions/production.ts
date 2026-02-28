@@ -12,6 +12,10 @@ export type ProductionUpdate = {
 
 export async function getProductionWOs() {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from('work_orders')
     .select('*, items(item_code, description), purchase_orders(po_number)')
@@ -28,6 +32,15 @@ export async function getProductionWOs() {
 
 export async function updateProduction(updates: ProductionUpdate[]) {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Unauthorized. Please sign in again.' };
+
+  for (const update of updates) {
+    if (update.produced_qty < 0 || update.rejection_qty < 0) {
+      return { error: 'Quantities cannot be negative.' };
+    }
+  }
 
   // RLS will handle plant_id checks ideally, but we rely on the session.
   // We process updates sequentially or in parallel.
