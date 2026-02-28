@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Container, Paper, Title, Select, Button, Group, Stack, Divider, Notification, Loader, Text } from '@mantine/core';
+import { Container, Paper, Title, Select, Button, Group, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { getCompletedWorkOrders, generateTCPreview, issueTC } from '@/app/actions/tc';
 
