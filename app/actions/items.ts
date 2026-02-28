@@ -10,6 +10,13 @@ type ItemUpdate = Database['public']['Tables']['items']['Update'];
 
 export async function getItems() {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error('Unauthorized getItems request: missing user session');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('items')
     .select('*')
@@ -25,6 +32,12 @@ export async function getItems() {
 
 export async function createItem(formData: ItemInsert) {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   const { error } = await supabase.from('items').insert(formData);
 
   if (error) {
@@ -37,6 +50,12 @@ export async function createItem(formData: ItemInsert) {
 
 export async function updateItem(id: string, formData: ItemUpdate) {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   const { error } = await supabase
     .from('items')
     .update(formData)
@@ -52,6 +71,12 @@ export async function updateItem(id: string, formData: ItemUpdate) {
 
 export async function deleteItem(id: string) {
   const supabase = createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
+
   const { error } = await supabase.from('items').delete().eq('id', id);
 
   if (error) {
