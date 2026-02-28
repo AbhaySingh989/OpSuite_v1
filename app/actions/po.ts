@@ -9,6 +9,8 @@ type POInsert = Database['public']['Tables']['purchase_orders']['Insert'];
 
 export async function getPOs() {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
   const { data, error } = await supabase
     .from('purchase_orders')
     .select('*, customers(name)')
