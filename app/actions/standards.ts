@@ -11,6 +11,11 @@ type ParameterInsert = Database['public']['Tables']['standard_parameters']['Inse
 
 export async function getStandards() {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error('Unauthorized getStandards request: missing user session');
+    return [];
+  }
   const { data, error } = await supabase
     .from('standards')
     .select('*, standard_parameters(*)')
@@ -26,6 +31,10 @@ export async function getStandards() {
 
 export async function createStandard(formData: StandardInsert) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
   const { data, error } = await supabase.from('standards').insert(formData).select().single();
 
   if (error) {
@@ -38,6 +47,10 @@ export async function createStandard(formData: StandardInsert) {
 
 export async function createParameter(formData: ParameterInsert) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
   const { error } = await supabase.from('standard_parameters').insert(formData);
 
   if (error) {
@@ -50,6 +63,10 @@ export async function createParameter(formData: ParameterInsert) {
 
 export async function deleteStandard(id: string) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
   const { error } = await supabase.from('standards').delete().eq('id', id);
 
   if (error) {
@@ -62,6 +79,10 @@ export async function deleteStandard(id: string) {
 
 export async function deleteParameter(id: string) {
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: 'Unauthorized. Please sign in again.' };
+  }
   const { error } = await supabase.from('standard_parameters').delete().eq('id', id);
 
   if (error) {
