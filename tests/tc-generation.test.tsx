@@ -55,7 +55,7 @@ describe('TC Generation Module', () => {
 
     // Default User Role Mock
     // We need to implement .from() to return specific data based on table name
-    mockSupabase.from.mockImplementation((table) => {
+    mockSupabase.from.mockImplementation(((table: any) => {
        const chain = {
           select: vi.fn().mockReturnThis(),
           eq: vi.fn().mockReturnThis(),
@@ -70,11 +70,11 @@ describe('TC Generation Module', () => {
       chain.order.mockResolvedValue({ data: [] });
 
       return chain;
-    });
+    }) as any);
   });
 
   it('should block TC generation if WO is not completed', async () => {
-    mockSupabase.from.mockImplementation((table) => {
+    mockSupabase.from.mockImplementation(((table: any) => {
       const chain = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn(), order: vi.fn(), insert: vi.fn(), update: vi.fn() };
 
       if (table === 'user_roles') chain.single.mockResolvedValue({ data: { plant_id: 'p1', roles: { name: 'qa' } } });
@@ -82,7 +82,7 @@ describe('TC Generation Module', () => {
       else chain.single.mockResolvedValue({ data: null });
 
       return chain;
-    });
+    }) as any);
 
     const result = await getTCData('wo-123', '3.1');
     expect(result.error).toContain('Work Order is not completed');
@@ -96,14 +96,14 @@ describe('TC Generation Module', () => {
         ]
      };
 
-     mockSupabase.from.mockImplementation((table) => {
+     mockSupabase.from.mockImplementation(((table: any) => {
         const chain = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn(), order: vi.fn(), insert: vi.fn(), update: vi.fn() };
         if (table === 'user_roles') chain.single.mockResolvedValue({ data: { plant_id: 'p1', roles: { name: 'qa' } } });
         if (table === 'work_orders') chain.single.mockResolvedValue({ data: mockWO });
         if (table === 'lab_results') chain.single.mockResolvedValue({ data: mockLab });
         if (table === 'users') chain.single.mockResolvedValue({ data: { full_name: 'Tester' } });
         return chain;
-     });
+     }) as any);
 
      const result = await getTCData('wo-123', '3.1');
      expect(result.error).toContain('Lab results contain failed parameters');
@@ -120,7 +120,7 @@ describe('TC Generation Module', () => {
       const mockAlloc = { quantity: 100, heats: { heat_number: 'H1' } };
       const mockPlant = { name: 'Plant 1', location: 'Loc 1' };
 
-      mockSupabase.from.mockImplementation((table) => {
+      mockSupabase.from.mockImplementation(((table: any) => {
          const chain = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn(), order: vi.fn(), insert: vi.fn(), update: vi.fn() };
          if (table === 'user_roles') chain.single.mockResolvedValue({ data: { plant_id: 'p1', roles: { name: 'qa' } } });
          if (table === 'work_orders') chain.single.mockResolvedValue({ data: mockWO });
@@ -130,7 +130,7 @@ describe('TC Generation Module', () => {
          if (table === 'test_certificates') chain.single.mockResolvedValue({ data: null });
          if (table === 'users') chain.single.mockResolvedValue({ data: { full_name: 'Tester' } });
          return chain;
-      });
+      }) as any);
 
       const result = await getTCData('wo-123', '3.1');
       expect(result.error).toBeUndefined();
@@ -145,7 +145,7 @@ describe('TC Generation Module', () => {
       const mockPlant = { name: 'P1' };
       const existingTC = { current_version: 2, id: 'tc-1' };
 
-      mockSupabase.from.mockImplementation((table) => {
+      mockSupabase.from.mockImplementation(((table: any) => {
         const chain = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn(), order: vi.fn(), insert: vi.fn(), update: vi.fn() };
         if (table === 'user_roles') chain.single.mockResolvedValue({ data: { plant_id: 'p1', roles: { name: 'qa' } } });
         if (table === 'work_orders') chain.single.mockResolvedValue({ data: mockWO });
@@ -155,7 +155,7 @@ describe('TC Generation Module', () => {
         if (table === 'test_certificates') chain.single.mockResolvedValue({ data: existingTC });
         if (table === 'users') chain.single.mockResolvedValue({ data: { full_name: 'Tester' } });
         return chain;
-      });
+      }) as any);
 
       const result = await getTCData('wo-123', '3.1');
       expect(result.data?.version).toBe(3);
