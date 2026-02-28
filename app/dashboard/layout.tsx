@@ -1,6 +1,6 @@
 'use client';
 
-import { AppShell, Burger, Group, NavLink, Text, ThemeIcon, Stack, ScrollArea, Avatar } from '@mantine/core';
+import { AppShell, Burger, Group, NavLink, Text, ThemeIcon, Stack, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconDashboard,
